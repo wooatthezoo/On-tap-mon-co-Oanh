@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ôn Tập Hải Dương Học Sinh Địa Hóa - Cô Oanh</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --bg: #f0f9ff;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Header */
+    header { background: var(--card-bg); padding: 18px 24px; border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center; }
+    h1 { font-size: 1.35rem; color: var(--primary-dark); margin-bottom: 6px; }
+    .subtitle { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Controls Bar */
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 12px 16px; border-radius: var(--radius); }
+    .filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; outline: none; background: #fff; cursor: pointer; max-width: 250px; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    button { padding: 8px 14px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+
+    /* Progress & Stats */
+    .stats-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .progress-bar-container { width: 100%; height: 8px; background: #e0f2fe; border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+    /* Quiz Card */
+    .card { background: var(--card-bg); padding: 24px; border-radius: var(--radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); position: relative; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; background: #e0f2fe; color: var(--primary-dark); }
+    .question-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; margin-bottom: 20px; color: #1e293b; }
+
+    /* Options */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn { width: 100%; text-align: left; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 10px; background: white; font-size: 0.95rem; line-height: 1.4; color: var(--text); cursor: pointer; transition: all 0.15s ease; }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #f0f9ff; }
+    .option-btn.correct { background: #ecfdf5 !important; border-color: var(--success) !important; color: #065f46 !important; font-weight: 600; }
+    .option-btn.wrong { background: #fef2f2 !important; border-color: var(--danger) !important; color: #991b1b !important; }
+    .option-btn:disabled { cursor: default; }
+
+    /* Explanation Box */
+    .explanation-box { margin-top: 18px; padding: 14px; border-radius: 8px; background: #f8fafc; border-left: 4px solid var(--primary); font-size: 0.9rem; line-height: 1.45; display: none; }
+    .explanation-box.show { display: block; }
+    .explanation-title { font-weight: 700; margin-bottom: 4px; color: var(--primary-dark); }
+
+    /* Footer Nav */
+    .footer-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    
+    /* Result Screen */
+    .result-screen { text-align: center; padding: 30px 10px; display: none; }
+    .score-circle { width: 110px; height: 110px; border-radius: 50%; background: #e0f2fe; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; margin: 0 auto 16px; border: 4px solid var(--primary); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Hải Dương Học Sinh Địa Hóa</h1>
+    <div class="subtitle">Đề cương ôn tập trắc nghiệm - Cô Oanh</div>
+  </header>
+
+  <!-- Control panel -->
+  <div class="controls">
+    <select id="topicFilter" class="filter-select" onchange="changeTopic()">
+      <option value="ALL">-- Tất cả các phần --</option>
+      <option value="CHƯƠNG 1">Phần 1: Cơ sở chu trình & Cân bằng</option>
+      <option value="CHƯƠNG 2">Phần 2: Thành phần & Độ muối</option>
+      <option value="CHƯƠNG 3">Phần 3: Tương tác vật chất & Vi sinh</option>
+      <option value="CHƯƠNG 4">Phần 4: Đồng vị hải dương</option>
+      <option value="DINH DƯỠNG">Phần 5: Chu trình dinh dưỡng (N, P, Si)</option>
+      <option value="CARBON">Phần 6: Chu trình Carbon & Các Bơm</option>
+      <option value="HỆ CARBONATE">Phần 7: Hệ Carbonate & Acid hóa</option>
+      <option value="BÀI TẬP">Phần 8: Bài tập tính toán & Định lượng</option>
+    </select>
+
+    <div class="btn-group">
+      <button class="btn-outline" onclick="shuffleCurrentList()">🔀 Xáo trộn</button>
+      <button id="btnRedoWrong" class="btn-warning" style="display:none;" onclick="startRedoWrong()">⚠️ Luyện câu sai (<span id="wrongCountBadge">0</span>)</button>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="stats-bar">
+    <span id="progressText">Câu: 1 / 100</span>
+    <span id="scoreText">Đúng: 0 | Sai: 0</span>
+  </div>
+  <div class="progress-bar-container">
+    <div id="progressBar" class="progress-bar-fill"></div>
+  </div>
+
+  <!-- Quiz Card -->
+  <div class="card" id="quizCard">
+    <span id="badgeTopic" class="badge">CHUYÊN ĐỀ</span>
+    <div id="questionText" class="question-text">Đang tải câu hỏi...</div>
+    <div id="optionsGrid" class="options-grid"></div>
+
+    <div id="explanationBox" class="explanation-box">
+      <div class="explanation-title">💡 Giải thích / Ghi nhớ nhanh:</div>
+      <div id="explanationText"></div>
+    </div>
+
+    <div class="footer-nav">
+      <button class="btn-outline" onclick="prevQuestion()" id="btnPrev">← Câu trước</button>
+      <button class="btn-primary" onclick="nextQuestion()" id="btnNext">Câu tiếp theo →</button>
+    </div>
+  </div>
+
+  <!-- Finish screen -->
+  <div class="card result-screen" id="resultScreen">
+    <div class="score-circle" id="finalScore">100%</div>
+    <h2>Hoàn thành bài ôn tập!</h2>
+    <p id="resultSummary" style="color: var(--text-muted); margin: 12px 0 20px;">Bạn đã trả lời đúng ... câu.</p>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button class="btn-primary" onclick="restartQuiz()">🔄 Làm lại từ đầu</button>
+      <button id="btnResultRedoWrong" class="btn-warning" onclick="startRedoWrong()">⚠️ Luyện lại các câu sai</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// DỮ LIỆU ĐÃ ĐƯỢC CHUẨN HÓA VÀ LỌC FORMAT HOÀN TOÀN
+const rawDatabase = [
+  // PHẦN 1
+  {
+    topic: "CHƯƠNG 1",
+    q: "Chu trình sinh địa hóa là quá trình:",
+    options: [
+      "Chỉ xảy ra sự biến đổi trạng thái vật lý của nước trong thủy quyển.",
+      "Vận chuyển và biến đổi vật chất qua lại giữa thủy quyển, khí quyển, thạch quyển và sinh quyển.",
+      "Lắng đọng vĩnh viễn các hợp chất hữu cơ xuống đáy đại dương.",
+      "Trao đổi năng lượng một chiều mà không có sự tuần hoàn vật chất."
+    ],
+    ans: 1,
+    hint: "Chu trình sinh địa hóa bao gồm cả 4 quyển: Thủy, Khí, Thạch và Sinh quyển."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Đại lượng biểu thị lượng vật chất tích tụ và lưu giữ bên trong một không gian hoặc hệ thống xác định được gọi là:",
+    options: ["Thông lượng (Flux).", "Thời gian lưu (Residence time).", "Kho chứa / Bể chứa (Reservoir).", "Tốc độ quay vòng (Turnover rate)."],
+    ans: 2,
+    hint: "Reservoir là nơi lưu trữ vật chất."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Thông lượng (Flux) được định nghĩa là:",
+    options: [
+      "Tổng khối lượng vật chất đang hòa tan trong toàn bộ cột nước.",
+      "Tốc độ vận chuyển hay lượng vật chất di chuyển vào hoặc ra khỏi bể chứa trong một đơn vị thời gian.",
+      "Thời gian cần thiết để một chất phân hủy hoàn toàn trong đại dương.",
+      "Tỷ lệ phần trăm của một chất so với nồng độ ion Clo."
+    ],
+    ans: 1,
+    hint: "Flux = Lượng vận chuyển / Đơn vị thời gian."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Trong phương trình cân bằng khối lượng dM/dt = F(in) - F(out) + P - R, trạng thái dừng (steady state) đạt được khi nào?",
+    options: ["dM/dt > 0.", "F(in) lớn hơn F(out).", "dM/dt = 0 (lượng vào và sinh ra cân bằng với lượng ra và tiêu thụ).", "P và R luôn bằng 0."],
+    ans: 2,
+    hint: "Trạng thái dừng nghĩa là nồng độ/khối lượng không đổi theo thời gian (dM/dt = 0)."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Điều gì xảy ra với lượng vật chất M trong bể chứa nếu F(in) > F(out) (giả sử P = 0, R = 0)?",
+    options: ["Lượng vật chất M không đổi.", "Lượng vật chất M giảm dần theo thời gian.", "Lượng vật chất M tăng dần theo thời gian.", "Thời gian lưu của chất đó tiến tới vô cùng."],
+    ans: 2,
+    hint: "Vào lớn hơn Ra thì tích lũy M sẽ tăng dần."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Nhóm chất nào sau đây được phân loại là thành phần bảo toàn (conservative elements) trong nước biển?",
+    options: [
+      "Khí oxy hòa tan (DO), ion nitrate (NO3-), ion phosphate (PO4 3-).",
+      "Ion Cl-, Na+, SO4 2-, Mg 2+, Ca 2+, K+.",
+      "Chất hữu cơ hòa tan (DOM), silic axit Si(OH)4, amoni NH4+.",
+      "Khí CO2 tự do, Fe, Zn, Cu."
+    ],
+    ans: 1,
+    hint: "Các ion chính có thời gian lưu rất dài và tỷ lệ cố định với độ muối."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Đặc điểm nổi bật của các thành phần không bảo toàn (non-conservative elements) trong nước biển là:",
+    options: [
+      "Tỷ lệ nồng độ của chúng luôn cố định so với độ muối ở mọi vùng biển.",
+      "Nồng độ của chúng chủ yếu bị kiểm soát bởi quá trình pha trộn vật lý.",
+      "Nồng độ biến đổi mạnh theo vị trí và độ sâu do tham gia vào các quá trình sinh - hóa học.",
+      "Có thời gian lưu cực kỳ dài (trên hàng chục triệu năm)."
+    ],
+    ans: 2,
+    hint: "Các chất dinh dưỡng, khí hòa tan bị sinh vật tiêu thụ/giải phóng liên tục nên không bảo toàn."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Nồng độ của một nguyên tố X trong đại dương phụ thuộc tuyến tính trực tiếp vào độ muối và không bị ảnh hưởng bởi hoạt động quang hợp hay phân hủy sinh học. Nguyên tố X là:",
+    options: ["Nguyên tố bảo toàn.", "Nguyên tố dinh dưỡng giới hạn.", "Phân đoạn hữu cơ dễ phân hủy.", "Nguyên tố không bảo toàn."],
+    ans: 0,
+    hint: "Phụ thuộc tuyến tính với độ muối = Nguyên tố bảo toàn."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Khối lượng ion Na+ hòa tan trong đại dương ước tính 1,47 x 10^16 tấn. Tốc độ sông cung cấp Na+ là 2,16 x 10^8 tấn/năm. Ở trạng thái dừng, thời gian lưu của Na+ xấp xỉ là:",
+    options: ["6,8 triệu năm.", "68 triệu năm.", "100 triệu năm.", "1 triệu năm."],
+    ans: 1,
+    hint: "Thời gian lưu tau = M / F = 1.47x10^16 / 2.16x10^8 ≈ 68 triệu năm."
+  },
+  {
+    topic: "CHƯƠNG 1",
+    q: "Một vịnh có F(in) = 50 kg/ngày đang ở trạng thái dừng. Do sự cố, F(in) tăng vọt lên 150 kg/ngày trong khi tốc độ loại bỏ F(out) vẫn là 50 kg/ngày. Xu hướng dM/dt ngay sau sự cố là:",
+    options: ["dM/dt = 0.", "dM/dt = +100 kg/ngày (tích lũy tăng dần).", "dM/dt = -100 kg/ngày.", "Nồng độ chất độc lập tức giảm về 0."],
+    ans: 1,
+    hint: "dM/dt = F(in) - F(out) = 150 - 50 = +100 kg/ngày."
+  },
+
+  // PHẦN 2
+  {
+    topic: "CHƯƠNG 2",
+    q: "Độ muối (Salinity, S) của nước biển được định nghĩa là:",
+    options: [
+      "Thể tích muối NaCl kết tinh thu được khi làm bay hơi 1 lít nước biển.",
+      "Tổng lượng các chất khoáng rắn hòa tan (tính bằng gam) có trong 1 kg nước biển.",
+      "Nồng độ phần trăm khối lượng của riêng ion Cl- trong nước biển.",
+      "Khối lượng kết tủa thu được khi cho dung dịch AgNO3 dư vào nước biển."
+    ],
+    ans: 1,
+    hint: "Đơn vị g/kg (hoặc ppt / phần nghìn)."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Độ muối trung bình của nước biển khơi (biển mở) trên thế giới xấp xỉ khoảng:",
+    options: ["15 ppt.", "25 ppt.", "35 ppt.", "50 ppt."],
+    ans: 2,
+    hint: "Độ muối trung bình đại dương là 35 ppt (35 g/kg)."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Theo phân loại nguồn nước dựa trên độ muối, nước lợ (brackish water) có khoảng độ muối là:",
+    options: ["Dưới 0.5 g/kg.", "1.0 đến 25.0 g/kg.", "25.0 đến 50.0 g/kg.", "Lớn hơn 50.0 g/kg."],
+    ans: 1,
+    hint: "Nước lợ nằm trong khoảng từ 1.0 đến 25.0 g/kg."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Kích thước màng lọc tiêu chuẩn để phân tách giữa dạng hòa tan (Dissolved) và dạng hạt (Particulate) là:",
+    options: ["1.00 micromet.", "0.45 micromet.", "0.10 micromet.", "2.50 micromet."],
+    ans: 1,
+    hint: "Màng lọc chuẩn quốc tế là 0.45 micromet."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Thành phần nào sau đây thuộc nhóm chất hữu cơ dạng hạt (POM)?",
+    options: ["DOC (Dissolved Organic Carbon).", "Tảo phù du (Phytoplankton) và vụn bã hữu cơ (detritus).", "Amino acid tự do hòa tan.", "Muối khoáng hòa tan."],
+    ans: 1,
+    hint: "Tảo và vụn bã hữu cơ bị giữ lại trên màng 0.45 micromet nên là POM."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Trong nước biển, 6 ion chính chiếm tỷ lệ khối lượng lớn nhất theo thứ tự giảm dần là:",
+    options: [
+      "Cl- > Na+ > SO4 2- > Mg 2+ > Ca 2+ > K+.",
+      "Na+ > Cl- > Mg 2+ > SO4 2- > K+ > Ca 2+.",
+      "Cl- > SO4 2- > HCO3- > Na+ > Ca 2+ > Mg 2+.",
+      "Na+ > Cl- > Ca 2+ > Mg 2+ > SO4 2- > HCO3-."
+    ],
+    ans: 0,
+    hint: "Thứ tự: Clo > Natri > Sulfat > Magie > Canxi > Kali."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "So sánh tương quan nồng độ các ion chính giữa nước biển và nước sông cho thấy:",
+    options: [
+      "Nước sông có hàm lượng Cl- và Na+ vượt trội so với nước biển.",
+      "Ở nước biển anion chiếm ưu thế là Cl-, trong khi ở nước sông anion chiếm ưu thế là HCO3-.",
+      "Ở cả nước sông và nước biển, cation Ca 2+ luôn có nồng độ lớn hơn Na+.",
+      "Nước biển và nước sông có tỷ lệ các ion hoàn toàn đồng nhất."
+    ],
+    ans: 1,
+    hint: "Nước biển trội Clorua; nước sông do phong hóa đá vôi nên trội Bicarbonate (HCO3-)."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Nguyên lý Dittmar (Định luật tỷ lệ không đổi) khẳng định rằng:",
+    options: [
+      "Tổng độ muối của tất cả các đại dương trên thế giới luôn bằng nhau tại mọi thời điểm.",
+      "Dù tổng độ muối có thay đổi, tỷ lệ tương đối giữa các ion chính trong nước biển vẫn là hằng số.",
+      "Nồng độ của các chất dinh dưỡng (N, P, Si) luôn cố định ở mọi tầng sâu.",
+      "Nồng độ của khí oxy và cacbonic luôn ở trạng thái bão hòa."
+    ],
+    ans: 1,
+    hint: "Tỷ lệ giữa các ion chính luôn là hằng số (Constancy of composition)."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Hạn chế lớn nhất của Nguyên lý Dittmar nằm ở nhóm ion nào do chúng tham gia vào chu trình sinh học, khí quyển và trầm tích?",
+    options: ["Ion Natri (Na+).", "Ion Clorua (Cl-).", "Nhóm cacbonat (HCO3- và CO3 2-).", "Ion Magie (Mg 2+)."],
+    ans: 2,
+    hint: "Hệ carbonate chịu tác động mạnh bởi quang hợp, hô hấp và hòa tan vỏ vôi."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Một mẫu nước biển có độ Clo Cl = 19.38 o/oo. Theo công thức S = 0.030 + 1.8050 x Cl, độ muối S là:",
+    options: ["35.01 o/oo.", "33.50 o/oo.", "36.85 o/oo.", "34.12 o/oo."],
+    ans: 0,
+    hint: "S = 0.030 + 1.8050 * 19.38 = 35.01 o/oo."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Tỷ lệ chuẩn Na+/Cl- = 0.56. Nếu nồng độ Cl- là 20.00 g/kg, nồng độ của ion Na+ xấp xỉ là:",
+    options: ["10.76 g/kg.", "11.20 g/kg.", "15.50 g/kg.", "35.00 g/kg."],
+    ans: 1,
+    hint: "Na+ = 20.00 * 0.56 = 11.20 g/kg."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Nguyên tố nào sau đây thuộc nhóm nguyên tố vết (trace elements) có vai trò sinh học tối quan trọng nhưng nồng độ cực thấp?",
+    options: ["Clo (Cl).", "Sắt (Fe).", "Canxi (Ca).", "Magie (Mg)."],
+    ans: 1,
+    hint: "Sắt (Fe) là vi chất dinh dưỡng giới hạn ở vùng HNLC."
+  },
+  {
+    topic: "CHƯƠNG 2",
+    q: "Các kim loại nặng độc hại trong nước biển không có ngưỡng an toàn sinh học bao gồm:",
+    options: ["Na, K, Ca, Mg.", "Hg, Pb, Cd.", "N, P, Si, C.", "Cl, Br, F."],
+    ans: 1,
+    hint: "Thủy ngân (Hg), Chì (Pb), Cadimi (Cd)."
+  },
+
+  // PHẦN 3 & 4: VI SINH, TRẦM TÍCH, ĐỒNG VỊ
+  {
+    topic: "CHƯƠNG 3",
+    q: "Hiện tượng nước trồi (Upwelling) có vai trò quan trọng vì:",
+    options: [
+      "Đưa nước mặt ấm nghèo dinh dưỡng chìm xuống đáy đại dương.",
+      "Vận chuyển các khối nước sâu giàu chất dinh dưỡng lên tầng ưu quang, thúc đẩy sinh vật phù du phát triển.",
+      "Làm giảm độ muối của nước biển tầng mặt xuống mức nước ngọt.",
+      "Đưa khí oxy từ tầng sâu lên làm bão hòa khí quyển."
+    ],
+    ans: 1,
+    hint: "Nước trồi đưa dinh dưỡng tái khoáng từ đáy lên mặt biển."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Nguồn cung cấp bụi khoáng giàu sắt (Fe) quan trọng nhất cho các vùng biển xa bờ là từ:",
+    options: ["Nước thải sinh hoạt đô thị.", "Trầm tích biển sâu tự hòa tan.", "Quá trình lắng đọng khí quyển (gió mang bụi sa mạc).", "Băng tan ở hai cực."],
+    ans: 2,
+    hint: "Bụi sa mạc bay theo gió là nguồn bổ sung Fe chính cho biển khơi."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Sơ đồ nào sau đây mô tả đúng trình tự của 'Vòng tuần hoàn vi sinh' (Microbial loop) trong đại dương?",
+    options: [
+      "DOM -> Tảo phù du -> Cá lớn -> Vi khuẩn.",
+      "Tảo phù du -> DOM -> Vi khuẩn -> Sinh khối vi sinh vật -> Động vật phù du.",
+      "Trầm tích -> Khí quyển -> Động vật phù du -> Nước biển.",
+      "POM -> Cá hồi -> Nước sông -> Biển khơi."
+    ],
+    ans: 1,
+    hint: "Vi khuẩn hấp thụ DOM rồi biến thành sinh khối cho động vật phù du ăn."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Khái niệm 'Bơm vi sinh carbon' (Microbial Carbon Pump - MCP) trong hải dương học đề cập đến quá trình:",
+    options: [
+      "Vi khuẩn quang hợp hấp thụ toàn bộ CO2 từ khí quyển.",
+      "Động vật phù du vận chuyển các hạt phân hữu cơ chìm nhanh xuống đáy biển.",
+      "Vi khuẩn chuyển hóa chất hữu cơ hòa tan dễ phân hủy (Labile DOC) thành chất hữu cơ hòa tan bền vững (Refractory DOC) khó phân hủy.",
+      "Động vật đáy tạo vỏ đá vôi CaCO3 để chôn vùi carbon trong trầm tích."
+    ],
+    ans: 2,
+    hint: "MCP = Labile DOC -> Refractory DOC (tồn tại hàng ngàn năm)."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Khi cường độ quang hợp của thực vật phù du tăng mạnh ở tầng mặt, những biến động hóa học nào diễn ra đồng thời?",
+    options: [
+      "PO4 3- giảm, DO tăng, CO2 hòa tan giảm.",
+      "PO4 3- tăng, DO giảm, CO2 hòa tan tăng.",
+      "PO4 3- giảm, DO giảm, Cl- tăng đột biến.",
+      "Tỷ lệ Na+/Cl- thay đổi rõ rệt do thực vật tiêu thụ Na+."
+    ],
+    ans: 0,
+    hint: "Quang hợp: hấp thụ CO2 và PO4 3-, giải phóng khí O2 (DO tăng)."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Độ lệch đồng vị delta (đơn vị phần nghìn, o/oo) được xác định bằng công thức so sánh:",
+    options: [
+      "Nồng độ khối lượng của chất so với nồng độ thể tích.",
+      "Tỷ lệ đồng vị của mẫu phân tích so với tỷ lệ đồng vị của một mẫu chuẩn quốc tế.",
+      "Khối lượng nguyên tử của đồng vị phóng xạ so với chu kỳ bán rã.",
+      "Nồng độ phần triệu của nguyên tố trong nước sông so với nước biển."
+    ],
+    ans: 1,
+    hint: "delta = (R_mẫu - R_chuẩn) / R_chuẩn * 1000."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Cặp đồng vị bền nào thường dùng phổ biến nhất để nghiên cứu nguồn gốc khối nước, chu trình thủy văn và cổ nhiệt độ đại dương?",
+    options: ["C-14 và C-12.", "O-18 và O-16 (delta 18O).", "Pb-210 và Ra-226.", "Th-234 và U-238."],
+    ans: 1,
+    hint: "delta 18O phản ánh nhiệt độ và sự bốc hơi/đóng băng."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Để xác định bậc dinh dưỡng của các loài sinh vật trong mạng lưới thức ăn biển, người ta sử dụng đồng vị bền của nguyên tố nào?",
+    options: ["Hydro (H-2).", "Oxy (O-18).", "Nitơ (N-15).", "Chì (Pb-210)."],
+    ans: 2,
+    hint: "delta 15N tích lũy làm giàu qua từng bậc dinh dưỡng (khoảng +3 đến +4 o/oo mỗi bậc)."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Để phân biệt nguồn chất hữu cơ trong trầm tích đến từ thực vật lục địa hay từ sinh vật biển, người ta dựa vào:",
+    options: ["Tỷ lệ đồng vị bền carbon delta 13C.", "Tỷ lệ đồng vị phóng xạ Th-234.", "Nồng độ ion Na+.", "Độ kiềm tổng của nước biển."],
+    ans: 0,
+    hint: "Sinh vật biển có delta 13C khoảng -20 đến -22 o/oo; thực vật C3 trên cạn khoảng -26 đến -28 o/oo."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Đồng vị phóng xạ Th-234 (chu kỳ bán rã 24.1 ngày) được ứng dụng chủ yếu để nghiên cứu:",
+    options: [
+      "Tuổi của nước đáy đại dương hàng ngàn năm trước.",
+      "Tốc độ xuất khẩu và lắng đọng của các hạt vật chất hữu cơ rời khỏi tầng ưu quang (bơm sinh học).",
+      "Nguồn gốc dòng chảy ngầm từ lục địa xả ra biển.",
+      "Tốc độ phong hóa đá granit trên lưu vực sông."
+    ],
+    ans: 1,
+    hint: "Th-234 bám dính hạt cực mạnh nên dùng để đo thông lượng xuất khẩu hạt POC."
+  },
+  {
+    topic: "CHƯƠNG 4",
+    q: "Đồng vị phóng xạ nào dùng để xác định niên đại trầm tích ven bờ trong khoảng 100 đến 150 năm gần đây nhằm đánh giá lịch sử ô nhiễm?",
+    options: ["C-14.", "Pb-210.", "Th-230.", "N-15."],
+    ans: 1,
+    hint: "Pb-210 có chu kỳ bán rã 22.3 năm, rất thích hợp đo thang thời gian 100 - 150 năm."
+  },
+
+  // CHU TRÌNH DINH DƯỠNG (N, P, Si)
+  {
+    topic: "DINH DƯỠNG",
+    q: "Silicon hòa tan trong nước biển tồn tại chủ yếu dưới dạng hóa học nào để tảo Silic (Diatom) hấp thụ tạo vỏ?",
+    options: ["SiO2 dạng tinh thể cát.", "Silicic acid [Si(OH)4].", "Ion Silicat kết tủa (SiO3 2-).", "Hợp chất hữu cơ phức Silic."],
+    ans: 1,
+    hint: "Dạng hòa tan sinh học là Axit Silicic Si(OH)4."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Nguồn nào sau đây KHÔNG PHẢI là nguồn cung cấp chất dinh dưỡng chính cho tầng mặt của đại dương?",
+    options: [
+      "Dòng chảy sông ngòi từ lục địa.",
+      "Lắng đọng bụi khoáng từ khí quyển.",
+      "Hiện tượng nước trồi (Upwelling).",
+      "Sự quang hợp của thực vật phù du ở tầng ưu quang."
+    ],
+    ans: 3,
+    hint: "Quang hợp là quá trình TIÊU THỤ dinh dưỡng chứ không phải nguồn cung cấp."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Quá trình khử ion Nitrate (NO3-) thành khí Nitơ tự do (N2) trong điều kiện thiếu khí/kỵ khí được gọi là:",
+    options: ["Cố định đạm (Nitrogen fixation).", "Nitrat hóa (Nitrification).", "Phản Nitrat hóa (Denitrification).", "Đồng hóa dinh dưỡng (Assimilation)."],
+    ans: 2,
+    hint: "NO3- -> NO2- -> NO -> N2O -> N2 là Phản nitrat hóa (Denitrification)."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Quá trình chuyển hóa ion Ammonium (NH4+) thành Nitrite (NO2-) rồi thành Nitrate (NO3-) với sự tham gia của oxy là:",
+    options: ["Nitrat hóa (Nitrification).", "Cố định đạm sinh học.", "Quá trình Anammox.", "Tái khoáng hóa chất hữu cơ."],
+    ans: 0,
+    hint: "Oxy hóa NH4+ thành NO3- là quá trình Nitrat hóa."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Tỷ lệ Redfield kinh điển biểu diễn tỷ lệ mol tương đối C : N : P trong sinh khối thực vật phù du là:",
+    options: ["1 : 16 : 106.", "106 : 16 : 1.", "163 : 22 : 1.", "106 : 1 : 16."],
+    ans: 1,
+    hint: "Redfield kinh điển: C:N:P = 106:16:1."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Nghiên cứu cập nhật quy mô toàn cầu của Martiny và cs (2014) điều chỉnh giá trị trung vị của tỷ lệ Redfield C : N : P thành:",
+    options: ["106 : 16 : 1.", "106 : 16 : 0.1.", "163 : 22 : 1.", "14.3 : 1 : 16."],
+    ans: 2,
+    hint: "Tỷ lệ Martiny (2014): 163 : 22 : 1."
+  },
+  {
+    topic: "DINH DƯỠNG",
+    q: "Quy luật phân bố nồng độ các chất dinh dưỡng (NO3-, PO4 3-, Si(OH)4) theo chiều thẳng đứng trong cột nước biển là:",
+    options: [
+      "Rất cao ở tầng mặt, giảm mạnh khi xuống sâu.",
+      "Rất thấp ở tầng mặt ưu quang, tăng mạnh và duy trì nồng độ cao ở tầng sâu.",
+      "Đồng đều tuyệt đối từ mặt biển xuống đến đáy.",
+      "Đạt cực đại ở tầng mặt và bằng 0 ở đáy."
+    ],
+    ans: 1,
+    hint: "Tầng mặt bị tảo hút cạn kiệt; tầng sâu giàu dinh dưỡng do xác hữu cơ chìm xuống bị vi khuẩn phân hủy giải phóng lại."
+  },
+
+  // CHU TRÌNH CARBON VÀ CÁC BƠM
+  {
+    topic: "CARBON",
+    q: "Trữ lượng khí CO2 được lưu giữ trong đại dương toàn cầu lớn hơn so với khí quyển khoảng:",
+    options: ["2 lần.", "10 lần.", "50 lần.", "500 lần."],
+    ans: 2,
+    hint: "Đại dương chứa lượng Carbon gấp khoảng 50 lần khí quyển."
+  },
+  {
+    topic: "CARBON",
+    q: "Tổng lượng Carbon vô cơ hòa tan (DIC) trong nước biển bao gồm tổng nồng độ của:",
+    options: ["[CO2*] + [DOC] + [POC].", "[CO2*] + [HCO3-] + [CO3 2-].", "[HCO3-] + [CO3 2-] + [CaCO3].", "[CH4] + [CO] + [CO2]."],
+    ans: 1,
+    hint: "DIC = [CO2 hòa tan] + [HCO3-] + [CO3 2-]."
+  },
+  {
+    topic: "CARBON",
+    q: "Trong nước biển tự nhiên (pH ≈ 8.1, DIC ≈ 2020 micromol/kg), dạng carbon vô cơ nào chiếm tỷ lệ vượt trội nhất?",
+    options: ["Ion Carbonate (CO3 2-) ~80%.", "Khí CO2 tự do ([CO2*]) ~50%.", "Ion Bicarbonate (HCO3-) ~89 - 90%.", "Acid carbonic tự do (H2CO3) ~99%."],
+    ans: 2,
+    hint: "Ở pH 8.1, dạng HCO3- chiếm tới ~89-90% tổng DIC."
+  },
+  {
+    topic: "CARBON",
+    q: "'Bơm sinh học Carbon' (Biological Carbon Pump - BCP) đưa carbon xuống đáy biển qua cơ chế nào?",
+    options: [
+      "Sự khuếch tán vật lý thụ động của khí CO2 qua bề mặt biển.",
+      "Thực vật phù du quang hợp cố định carbon, sau đó xác và hạt hữu cơ (tuyết đại dương) chìm lắng xuống sâu.",
+      "Sự bốc hơi nước mặt làm tăng tỷ trọng của khối nước biển.",
+      "Sự hòa tan đá vôi từ lục địa mang ra biển theo dòng chảy ngầm."
+    ],
+    ans: 1,
+    hint: "BCP hoạt động nhờ sự lắng đọng của các hạt hữu cơ (POM/fecal pellets)."
+  },
+  {
+    topic: "CARBON",
+    q: "Cơ chế hoạt động của 'Bơm độ tan Carbon' (Solubility Pump) dựa trên nguyên lý:",
+    options: [
+      "Nước ấm hòa tan nhiều CO2 hơn nước lạnh.",
+      "CO2 tan tốt hơn trong nước lạnh và mặn ở vĩ độ cao; khi nước lạnh chìm xuống sâu (tuần hoàn nhiệt muối) sẽ mang theo CO2.",
+      "Sinh vật phù du sử dụng ánh sáng để biến CO2 thành đá vôi.",
+      "Vi khuẩn kỵ khí phân giải CaCO3 giải phóng CO2 vào trầm tích."
+    ],
+    ans: 1,
+    hint: "Khí tan nhiều hơn ở nhiệt độ thấp. Nước cực lạnh chìm xuống mang theo lượng lớn CO2 hòa tan."
+  },
+
+  // HỆ THỐNG CARBONATE VÀ ACID HÓA
+  {
+    topic: "HỆ CARBONATE",
+    q: "Độ kiềm Carbonate (Ac) của nước biển được biểu diễn bằng công thức nào?",
+    options: ["Ac = [HCO3-] + [CO3 2-].", "Ac = [HCO3-] + 2[CO3 2-].", "Ac = 2[HCO3-] + [CO3 2-].", "Ac = [DIC] - [CO2*]."],
+    ans: 1,
+    hint: "Vì ion CO3 2- mang 2 điện tích âm nên Ac = [HCO3-] + 2[CO3 2-]."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Theo cân bằng HCO3- <=> H+ + CO3 2- (hằng số phân ly K2), công thức tính pH nào sau đây là đúng?",
+    options: [
+      "pH = pK2 + log([CO3 2-] / [HCO3-]).",
+      "pH = pK2 + log([HCO3-] / [CO3 2-]).",
+      "pH = pK2 - log([CO3 2-] * [HCO3-]).",
+      "pH = -log(K2) + [CO3 2-] / [HCO3-]."
+    ],
+    ans: 0,
+    hint: "Phương trình Henderson-Hasselbalch: pH = pK2 + log([Base] / [Acid])."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Khi nhiệt độ nước biển tăng lên, điều gì xảy ra với khí CO2 hòa tan?",
+    options: [
+      "Độ hòa tan của CO2 tăng lên.",
+      "Nước biển giải phóng bớt khí CO2 vào khí quyển do độ tan của chất khí giảm khi nhiệt độ tăng.",
+      "pH của nước biển tăng mạnh.",
+      "Toàn bộ ion HCO3- chuyển hóa thành H2CO3."
+    ],
+    ans: 1,
+    hint: "Nhiệt độ tăng làm giảm độ tan của mọi chất khí, khiến khí thoát ra ngoài."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Để giải đầy đủ các thông số của hệ carbonate bằng CO2SYS, cần cung cấp tối thiểu:",
+    options: [
+      "1 thông số carbon duy nhất cùng độ đục.",
+      "Ít nhất 2 thông số carbon độc lập cùng với nhiệt độ và độ muối.",
+      "Toàn bộ 4 thông số carbon (pH, pCO2, DIC, TA).",
+      "Chỉ cần nồng độ ion Natri và Clo."
+    ],
+    ans: 1,
+    hint: "Cần ít nhất 2 trong 4 thông số: pH, DIC, TA, pCO2."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Hiện tượng Acid hóa đại dương (Ocean Acidification) được gây ra trực tiếp bởi:",
+    options: [
+      "Sự rò rỉ acid sunfuric từ tàu chở dầu.",
+      "Lượng khí thải CO2 từ các hoạt động nhân sinh gia tăng trong khí quyển và khuếch tán vào đại dương.",
+      "Nước mưa acid từ nhà máy nhiệt điện.",
+      "Sự gia tăng ion OH- trong nước biển."
+    ],
+    ans: 1,
+    hint: "Đại dương hấp thụ CO2 từ đốt nhiên liệu hóa thạch làm giảm pH."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Chuỗi phản ứng nào mô tả đúng bản chất acid hóa đại dương khi hấp thụ thêm CO2?",
+    options: [
+      "CO2 tăng -> H+ tăng -> pH giảm -> CO3 2- giảm.",
+      "CO2 tăng -> H+ giảm -> pH tăng -> CO3 2- tăng.",
+      "CO2 tăng -> H+ tăng -> pH tăng -> CO3 2- tăng.",
+      "CO2 tăng -> HCO3- giảm -> pH giảm -> CO3 2- tăng."
+    ],
+    ans: 0,
+    hint: "CO2 + H2O -> H2CO3 -> H+ + HCO3-; H+ phản ứng tiếp với CO3 2- làm giảm nồng độ CO3 2-."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Tại sao khi CO2 khuếch tán thêm vào nước biển, nồng độ ion Carbonate (CO3 2-) lại bị suy giảm?",
+    options: [
+      "Do CO3 2- bị oxy hóa thành khí cacbonic.",
+      "Do H+ sinh ra từ CO2 phản ứng đệm với ion CO3 2- để tạo thành ion HCO3-.",
+      "Do sinh vật ngừng quang hợp.",
+      "Do ion CO3 2- phân rã thành khí metan."
+    ],
+    ans: 1,
+    hint: "Phản ứng đệm: H+ + CO3 2- -> HCO3- làm cạn kiệt nguồn ion carbonate."
+  },
+  {
+    topic: "HỆ CARBONATE",
+    q: "Sinh vật nào chịu tác động tiêu cực trực tiếp và nặng nề nhất khi độ bão hòa Aragonite/Calcite suy giảm?",
+    options: [
+      "Vi khuẩn lam.",
+      "Động vật có vỏ vôi và san hô (sử dụng CaCO3 để xây dựng vỏ và khung xương).",
+      "Cá ngừ đại dương và cá voi.",
+      "Tảo lục đơn bào không có vỏ."
+    ],
+    ans: 1,
+    hint: "Độ bão hòa giảm làm vỏ CaCO3 của san hô, ốc, sò bị ăn mòn và khó hình thành."
+  },
+
+  // BÀI TẬP VÀ ĐỊNH LƯỢNG
+  {
+    topic: "BÀI TẬP",
+    q: "Tổng ion Ca 2+ trong đại dương là 5.6 x 10^17 g. Tốc độ cung cấp từ sông là 5.6 x 10^11 g/năm. Ở trạng thái dừng, thời gian lưu của Ca 2+ là:",
+    options: ["100 ngàn năm.", "1 triệu năm (10^6 năm).", "10 triệu năm.", "68 triệu năm."],
+    ans: 1,
+    hint: "tau = M / F = 5.6x10^17 / 5.6x10^11 = 10^6 năm = 1 triệu năm."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Một kim loại X có trữ lượng 1.2 x 10^10 kg, tốc độ loại bỏ khỏi nước biển là 3.0 x 10^6 kg/năm. Thời gian lưu của kim loại X là:",
+    options: ["400 năm.", "4000 năm.", "40.000 năm.", "4 triệu năm."],
+    ans: 1,
+    hint: "tau = 1.2 x 10^10 / 3.0 x 10^6 = 4000 năm."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Phân tích mẫu nước biển có [NO3-] = 4.8 micromol/kg và [PO4 3-] = 0.6 micromol/kg. Nhận định nào chính xác?",
+    options: [
+      "Tỷ lệ N : P = 8 : 1; vùng nước bị giới hạn bởi Nitrogen (N-limited).",
+      "Tỷ lệ N : P = 8 : 1; vùng nước bị giới hạn bởi Phosphorus (P-limited).",
+      "Tỷ lệ N : P = 16 : 1; dinh dưỡng cân bằng hoàn hảo.",
+      "Tỷ lệ N : P = 0.125 : 1; không có sinh vật sinh sống."
+    ],
+    ans: 0,
+    hint: "N:P = 4.8 / 0.6 = 8 < 16 (ngưỡng Redfield chuẩn) -> Thiếu Nitơ -> N-limited."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Quần thể tảo hấp thụ hết 32 micromol/kg NO3-. Theo tỷ lệ 106 CO2 : 16 HNO3 : 1 H3PO4 : 150 O2, lượng PO4 3- tiêu thụ và O2 sinh ra là:",
+    options: [
+      "1 micromol/kg PO4 3- và 150 micromol/kg O2.",
+      "2 micromol/kg PO4 3- và 300 micromol/kg O2.",
+      "4 micromol/kg PO4 3- và 600 micromol/kg O2.",
+      "16 micromol/kg PO4 3- và 150 micromol/kg O2."
+    ],
+    ans: 1,
+    hint: "32 micromol NO3- ứng với 2 mol hệ số chuẩn (32/16 = 2) -> PO4 3- = 2*1 = 2; O2 = 2*150 = 300 micromol/kg."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Nước biển chứa 10 micromol/kg NO3- và 1.0 micromol/kg PO4 3-. Khi tảo tiêu thụ theo tỷ lệ chuẩn (16:1) đến khi cạn kiệt chất giới hạn, lượng PO4 3- còn dư là:",
+    options: ["0 micromol/kg.", "0.375 micromol/kg.", "0.625 micromol/kg.", "0.500 micromol/kg."],
+    ans: 1,
+    hint: "N hết trước. P tiêu thụ = 10 / 16 = 0.625 micromol. P dư = 1.0 - 0.625 = 0.375 micromol/kg."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Khi CO2 từ khí quyển hòa tan vào nước biển (acid hóa đại dương), các thông số biến đổi theo hướng nào?",
+    options: [
+      "DIC tăng, TA không đổi, pH giảm, [CO3 2-] giảm.",
+      "DIC tăng, TA tăng, pH tăng, [CO3 2-] tăng.",
+      "DIC không đổi, TA giảm, pH giảm, [CO3 2-] giảm.",
+      "DIC tăng, TA giảm, pH không đổi, [CO3 2-] tăng."
+    ],
+    ans: 0,
+    hint: "CO2 hòa tan làm tăng DIC nhưng KHÔNG làm thay đổi điện tích dung dịch nên TA giữ nguyên."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Khi sinh vật biển thực hiện phản ứng tạo vỏ vôi (Ca 2+ + CO3 2- -> CaCO3 kết tủa), sự biến đổi của DIC và TA là:",
+    options: [
+      "DIC giảm 1 đơn vị, TA giảm 2 đương lượng.",
+      "DIC tăng 1 đơn vị, TA tăng 2 đương lượng.",
+      "DIC giảm 2 đơn vị, TA giảm 1 đương lượng.",
+      "DIC không đổi, TA giảm 1 đương lượng."
+    ],
+    ans: 0,
+    hint: "Mất 1 C làm DIC giảm 1; mất 1 ion CO3 2- (mang 2 điện tích âm) làm TA giảm 2 đương lượng."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Khi hòa tan 1 mol đá vôi (CaCO3 + CO2 + H2O -> Ca 2+ + 2HCO3-), DIC và TA thay đổi như thế nào?",
+    options: [
+      "DIC tăng 1 đơn vị, TA không đổi.",
+      "DIC tăng 1 đơn vị, TA tăng 2 đương lượng.",
+      "DIC giảm 1 đơn vị, TA giảm 2 đương lượng.",
+      "Cả DIC và TA đều không đổi."
+    ],
+    ans: 1,
+    hint: "Hòa tan CaCO3 làm tăng DIC thêm 1 mol và tăng TA thêm 2 đương lượng."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Một mẫu nước có [HCO3-] = 1800 micromol/kg, [CO3 2-] = 180 micromol/kg, pK2 = 8.96. Áp dụng pH = pK2 + log([CO3 2-]/[HCO3-]), giá trị pH là:",
+    options: ["8.96.", "7.96.", "8.15.", "7.50."],
+    ans: 1,
+    hint: "pH = 8.96 + log(180/1800) = 8.96 + log(0.1) = 8.96 - 1 = 7.96."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Một vùng biển có [HCO3-] = 1750 micromol/kg và [CO3 2-] = 160 micromol/kg. Độ kiềm carbonate (Ac) là:",
+    options: ["1910 micromol/kg.", "2070 micromol/kg.", "3500 micromol/kg.", "1590 micromol/kg."],
+    ans: 1,
+    hint: "Ac = [HCO3-] + 2*[CO3 2-] = 1750 + 2*160 = 2070 micromol/kg."
+  },
+  {
+    topic: "BÀI TẬP",
+    q: "Nước biển có DIC = 2100, TA = 2300 micromol/kg. Do acid hóa, nước làm hòa tan thêm 50 micromol/kg vỏ CaCO3. Giá trị DIC và TA mới lần lượt là:",
+    options: [
+      "DIC = 2150 và TA = 2350 micromol/kg.",
+      "DIC = 2150 và TA = 2400 micromol/kg.",
+      "DIC = 2100 và TA = 2400 micromol/kg.",
+      "DIC = 2200 và TA = 2350 micromol/kg."
+    ],
+    ans: 1,
+    hint: "Hòa tan 50 CaCO3 -> DIC tăng 50 (2150); TA tăng 2*50 = 100 (2400)."
+  },
+
+  // KHÍ OXY, SULFUR, CARBON XANH
+  {
+    topic: "CHƯƠNG 3",
+    q: "Trong điều kiện kỵ khí tại trầm tích đáy biển, vi khuẩn khử sulfate tạo ra sản phẩm khí có mùi trứng thối đặc trưng là:",
+    options: ["Khí Methane (CH4).", "Khí Sulfua hydro (H2S).", "Khí Sulfur dioxide (SO2).", "Khí Nitơ dioxide (NO2)."],
+    ans: 1,
+    hint: "Vi khuẩn khử sulfate: SO4 2- -> H2S (mùi trứng thối)."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Hợp chất Dimethyl sulfide (DMS) do thực vật phù du giải phóng vào khí quyển có vai trò:",
+    options: [
+      "Hoạt động như hạt nhân ngưng kết mây (CCN), giúp tạo mây và làm mát Trái Đất.",
+      "Phá hủy trực tiếp tầng ozone ở bình lưu.",
+      "Làm tăng hiệu ứng nhà kính mạnh gấp ngàn lần CO2.",
+      "Tạo mưa acid diện rộng."
+    ],
+    ans: 0,
+    hint: "DMS -> hạt nhân ngưng kết mây (CCN) -> tăng độ phản xạ -> hạ nhiệt bề mặt."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Tình trạng thiếu oxy (Hypoxia) trong môi trường biển thường được quy ước khi nồng độ DO giảm xuống dưới:",
+    options: ["Dưới 10 mg/L.", "Dưới 2 mg/L (hoặc dưới ~63 micromol/L).", "Bằng 0 mg/L tuyệt đối.", "Dưới 0.01 mg/L."],
+    ans: 1,
+    hint: "Ngưỡng Hypoxia là DO < 2 mg/L."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Khái niệm 'Carbon xanh' (Blue Carbon) dùng để chỉ:",
+    options: [
+      "Carbon lưu trữ trong các mỏ dầu ngoài khơi.",
+      "Khí CO phát thải từ các dàn khoan biển.",
+      "Lượng carbon được hấp thụ và lưu giữ lâu dài bởi các hệ sinh thái biển và ven biển (đặc biệt là thảm thực vật).",
+      "Màu sắc của các khối chất hữu cơ trôi nổi."
+    ],
+    ans: 2,
+    hint: "Blue Carbon là carbon cô lập trong rừng ngập mặn, cỏ biển, đầm lầy triều."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Ba hệ sinh thái ven biển đóng vai trò chủ chốt và hiệu quả nhất trong việc cô lập 'Carbon xanh' là:",
+    options: [
+      "Rạn san hô, vùng biển khơi và đồng bằng băng giá.",
+      "Rừng ngập mặn (Mangroves), bãi lầy triều (Salt marshes) và thảm cỏ biển (Seagrasses).",
+      "Rừng thông ven biển, cồn cát và vùng triều đá.",
+      "Cửa sông bùn cát, vùng nước trồi và rãnh đại dương."
+    ],
+    ans: 1,
+    hint: "Bộ ba vàng Blue Carbon: Rừng ngập mặn, bãi lầy triều, cỏ biển."
+  },
+  {
+    topic: "CHƯƠNG 3",
+    q: "Vì sao hệ sinh thái carbon xanh (rừng ngập mặn, cỏ biển) có khả năng lưu giữ carbon trong đất vượt trội hơn rừng trên cạn?",
+    options: [
+      "Cây ngập mặn không bao giờ rụng lá.",
+      "Đất ngập nước thường xuyên trong điều kiện thiếu oxy (anoxic), làm tốc độ phân hủy chất hữu cơ của vi khuẩn chậm hơn rất nhiều so với tốc độ tích lũy.",
+      "Nước biển biến carbon thành kim cương.",
+      "Cây ngập mặn hấp thụ methane thay vì CO2."
+    ],
+    ans: 1,
+    hint: "Điều kiện yếm khí (anoxic) trong trầm tích ngập nước ức chế vi khuẩn phân hủy."
+  }
+];
+
+// BIẾN TRẠNG THÁI TOÀN CỤC
+let activeList = [];
+let wrongList = [];
+let currentIndex = 0;
+let userAnswers = {}; // Lưu đáp án người dùng chọn: { index: selectedOptionIndex }
+let isRedoMode = false;
+
+// KHỞI ĐỘNG ỨNG DỤNG
+function init() {
+  activeList = [...rawDatabase];
+  userAnswers = {};
+  wrongList = [];
+  currentIndex = 0;
+  isRedoMode = false;
+  document.getElementById("btnRedoWrong").style.display = "none";
+  loadQuestion();
+}
+
+// BỘ LỌC CHỦ ĐỀ
+function changeTopic() {
+  const selected = document.getElementById("topicFilter").value;
+  if (selected === "ALL") {
+    activeList = [...rawDatabase];
+  } else {
+    activeList = rawDatabase.filter(item => item.topic === selected);
+  }
+  userAnswers = {};
+  currentIndex = 0;
+  loadQuestion();
+}
+
+// XÁO TRỘN CÂU HỎI & ĐÁP ÁN (Fisher-Yates)
+function shuffleCurrentList() {
+  for (let i = activeList.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [activeList[i], activeList[j]] = [activeList[j], activeList[i]];
+  }
+  userAnswers = {};
+  currentIndex = 0;
+  loadQuestion();
+}
+
+// HIỂN THỊ CÂU HỎI
+function loadQuestion() {
+  if (activeList.length === 0) return;
+
+  const qData = activeList[currentIndex];
+  document.getElementById("quizCard").style.display = "block";
+  document.getElementById("resultScreen").style.display = "none";
+
+  // Cập nhật thông tin Header & Badge
+  document.getElementById("badgeTopic").innerText = qData.topic || "TRẮC NGHIỆM";
+  document.getElementById("questionText").innerText = qData.q;
+  
+  // Thanh tiến trình
+  const total = activeList.length;
+  document.getElementById("progressText").innerText = `Câu: ${currentIndex + 1} / ${total}`;
+  document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+  // Thống kê đúng/sai hiện tại
+  let correctCount = 0;
+  let answeredCount = Object.keys(userAnswers).length;
+  Object.keys(userAnswers).forEach(idx => {
+    if (userAnswers[idx] === activeList[idx].ans) correctCount++;
+  });
+  document.getElementById("scoreText").innerText = `Đã làm: ${answeredCount} | Đúng: ${correctCount} | Sai: ${answeredCount - correctCount}`;
+
+  // Nút Previous
+  document.getElementById("btnPrev").disabled = (currentIndex === 0);
+
+  // Tạo các lựa chọn
+  const optionsGrid = document.getElementById("optionsGrid");
+  optionsGrid.innerHTML = "";
+  const isAnswered = userAnswers.hasOwnProperty(currentIndex);
+
+  qData.options.forEach((optText, optIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerText = optText;
+    btn.onclick = () => selectOption(optIdx);
+
+    if (isAnswered) {
+      btn.disabled = true;
+      if (optIdx === qData.ans) {
+        btn.classList.add("correct");
+      }
+      if (userAnswers[currentIndex] === optIdx && optIdx !== qData.ans) {
+        btn.classList.add("wrong");
+      }
+    }
+    optionsGrid.appendChild(btn);
+  });
+
+  // Hộp giải thích
+  const expBox = document.getElementById("explanationBox");
+  const expText = document.getElementById("explanationText");
+  if (isAnswered) {
+    expBox.classList.add("show");
+    expText.innerText = qData.hint || "Không có giải thích thêm.";
+  } else {
+    expBox.classList.remove("show");
+  }
+
+  // Cập nhật nút luyện câu sai nếu có
+  updateWrongBadge();
+}
+
+// KHI NGƯỜI DÙNG CHỌN ĐÁP ÁN
+function selectOption(selectedIdx) {
+  if (userAnswers.hasOwnProperty(currentIndex)) return;
+
+  const currentQ = activeList[currentIndex];
+  userAnswers[currentIndex] = selectedIdx;
+
+  // Nếu sai thì thêm vào danh sách câu sai
+  if (selectedIdx !== currentQ.ans) {
+    if (!wrongList.some(item => item.q === currentQ.q)) {
+      wrongList.push(currentQ);
+    }
+  }
+
+  loadQuestion();
+}
+
+function nextQuestion() {
+  if (currentIndex < activeList.length - 1) {
+    currentIndex++;
+    loadQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    loadQuestion();
+  }
+}
+
+function updateWrongBadge() {
+  const badge = document.getElementById("wrongCountBadge");
+  const btn = document.getElementById("btnRedoWrong");
+  if (wrongList.length > 0) {
+    badge.innerText = wrongList.length;
+    btn.style.display = "inline-flex";
+  } else {
+    btn.style.display = "none";
+  }
+}
+
+// BẬT CHẾ ĐỘ LUYỆN LẠI CÂU SAI
+function startRedoWrong() {
+  if (wrongList.length === 0) return;
+  activeList = [...wrongList];
+  wrongList = []; // Reset lại để người dùng làm lại từ đầu
+  userAnswers = {};
+  currentIndex = 0;
+  isRedoMode = true;
+  loadQuestion();
+}
+
+// MÀN HÌNH TỔNG KẾT
+function showResults() {
+  document.getElementById("quizCard").style.display = "none";
+  const resultScreen = document.getElementById("resultScreen");
+  resultScreen.style.display = "block";
+
+  let correctCount = 0;
+  activeList.forEach((q, idx) => {
+    if (userAnswers[idx] === q.ans) correctCount++;
+  });
+
+  const total = activeList.length;
+  const pct = Math.round((correctCount / total) * 100);
+  document.getElementById("finalScore").innerText = `${pct}%`;
+  document.getElementById("resultSummary").innerText = `Bạn đã hoàn thành: Đúng ${correctCount} / ${total} câu hỏi.`;
+
+  const btnRedo = document.getElementById("btnResultRedoWrong");
+  if (wrongList.length > 0) {
+    btnRedo.style.display = "inline-flex";
+    btnRedo.innerText = `⚠️ Luyện lại ${wrongList.length} câu đã làm sai`;
+  } else {
+    btnRedo.style.display = "none";
+  }
+}
+
+function restartQuiz() {
+  changeTopic();
+}
+
+// Chạy khởi tạo
+init();
+</script>
+</body>
+</html>
